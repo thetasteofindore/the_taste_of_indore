@@ -3,12 +3,12 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCAjrpZzotiViOsw71DXHlL3IJB4kXnS7g",
-    authDomain: "the-taste-of-indore.firebaseapp.com",
-    projectId: "the-taste-of-indore",
-    storageBucket: "the-taste-of-indore.firebasestorage.app",
-    messagingSenderId: "657979658550",
-    appId: "1:657979658550:web:9240302e31ee17dc67a397"
+    apiKey: "AIzaSyCexCoHInrfs_jYh1itStv-r1O4PHhVLPY",
+    authDomain: "the-taste-of-indore-9c92a.firebaseapp.com",
+    projectId: "the-taste-of-indore-9c92a",
+    storageBucket: "the-taste-of-indore-9c92a.firebasestorage.app",
+    messagingSenderId: "550084866994",
+    appId: "1:550084866994:web:cb625aa9dadab60da22aab"
 };
 
 const app = initializeApp(firebaseConfig);
