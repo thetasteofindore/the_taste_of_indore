@@ -32,19 +32,21 @@ const About = () => {
                 {loading ? (
                     <div className="animate-pulse h-40 bg-gray-100 rounded-lg"></div>
                 ) : (
-                    <div className="space-y-8">
-                        {content.images && content.images.length > 0 && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                                {content.images.map((img, index) => (
-                                    <div key={index} className="rounded-xl overflow-hidden shadow-sm h-64">
-                                        <img src={img} alt={`About Us ${index + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                        <div className="prose prose-lg mx-auto text-[var(--color-text-main)] text-left">
+                    <div className="flex flex-col md:flex-row gap-8 items-start">
+                        <div className="prose prose-lg text-[var(--color-text-main)] text-left flex-1 order-2 md:order-1">
                             <p className="whitespace-pre-wrap">{content.text}</p>
                         </div>
+                        {content.images && content.images.length > 0 && (
+                            <div className="flex-1 order-1 md:order-2 w-full">
+                                <div className="grid grid-cols-1 gap-4">
+                                    {content.images.map((img, index) => (
+                                        <div key={index} className="rounded-xl overflow-hidden shadow-sm h-64 md:h-80">
+                                            <img src={img} alt={`About Us ${index + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </motion.div>

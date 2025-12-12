@@ -355,8 +355,13 @@ const AdminDashboard = () => {
     };
 
     const handleStatusUpdate = async (orderId, newStatus) => {
-        await orderService.updateOrderStatus(orderId, newStatus);
-        const updatedOrders = orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o);
+        let reason = null;
+        if (newStatus === 'Cancelled') {
+            reason = window.prompt("Please enter a reason for cancellation:", "Out of stock / Request denied");
+            if (!reason) return; // Cancel update if no reason provided
+        }
+        await orderService.updateOrderStatus(orderId, newStatus, reason);
+        const updatedOrders = orders.map(o => o.id === orderId ? { ...o, status: newStatus, cancellationReason: reason } : o);
         setOrders(updatedOrders);
     };
 
@@ -505,6 +510,9 @@ const AdminDashboard = () => {
                                         <td className="p-4">
                                             <div className="font-medium">{order.customer}</div>
                                             <div className="text-xs text-gray-500">{order.email}</div>
+                                            {order.cancellationReason && (
+                                                <div className="text-xs text-red-500 mt-1">Note: {order.cancellationReason}</div>
+                                            )}
                                         </td>
                                         <td className="p-4 text-gray-600">{order.date}</td>
                                         <td className="p-4 font-bold">₹{order.total}</td>

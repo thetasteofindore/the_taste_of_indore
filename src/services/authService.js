@@ -99,19 +99,22 @@ export const authService = {
   saveAddress: async (userId, address) => {
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
+
+    let currentAddresses = [];
     if (userDoc.exists()) {
-      const userData = userDoc.data();
-      const addresses = userData.addresses || [];
-      // Check if address already exists (simple check)
-      const exists = addresses.some(a => a.address === address.address && a.pincode === address.pincode);
-      if (!exists) {
-        const newAddresses = [...addresses, { ...address, id: Date.now() }];
-        await updateDoc(userRef, { addresses: newAddresses });
-        return newAddresses;
-      }
-      return addresses;
+      currentAddresses = userDoc.data().addresses || [];
     }
-    return [];
+
+    // Check if address already exists (simple check)
+    const exists = currentAddresses.some(a => a.address === address.address && a.pincode === address.pincode);
+
+    if (!exists) {
+      const newAddresses = [...currentAddresses, { ...address, id: Date.now() }];
+      // Use setDoc with merge: true to create if missing, update if exists
+      await setDoc(userRef, { addresses: newAddresses }, { merge: true });
+      return newAddresses;
+    }
+    return currentAddresses;
   },
 
   getAddresses: async (userId) => {

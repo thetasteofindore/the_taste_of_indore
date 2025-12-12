@@ -53,8 +53,8 @@ const Checkout = () => {
     }, [formData.state, shippingRates]);
 
     const fetchAddresses = async () => {
-        if (user?.id) {
-            const addresses = await authService.getAddresses(user.id);
+        if (user?.id || user?.uid) {
+            const addresses = await authService.getAddresses(user.uid || user.id);
             setSavedAddresses(addresses);
         }
     };
@@ -109,8 +109,8 @@ const Checkout = () => {
     };
 
     const handleSaveAddress = async () => {
-        if (user?.id) {
-            await authService.saveAddress(user.id, formData);
+        if (user?.id || user?.uid) {
+            await authService.saveAddress(user.uid || user.id, formData);
             fetchAddresses();
             alert('Address saved to your profile!');
         }

@@ -12,7 +12,7 @@ const Shop = () => {
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [sortBy, setSortBy] = useState('default');
 
-    const categories = ['All', 'Namkeen', 'Sweets', 'Spices', 'Staples'];
+    const categories = ['All', 'Sev'];
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -35,7 +35,12 @@ const Shop = () => {
 
         // Filter by Category
         if (selectedCategory !== 'All') {
-            result = result.filter(p => p.category === selectedCategory);
+            if (selectedCategory === 'Sev') {
+                // Show both Sev and Namkeen under "Sev" category
+                result = result.filter(p => p.category === 'Sev' || p.category === 'Namkeen');
+            } else {
+                result = result.filter(p => p.category === selectedCategory);
+            }
         }
 
         // Filter by Search
