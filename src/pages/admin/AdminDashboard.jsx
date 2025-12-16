@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { productService } from '../../services/productService';
 import { orderService } from '../../services/orderService';
-import { categoryService, bannerService, contentService, shippingService, paymentService, brandingService } from '../../services/adminServices';
+import { categoryService, bannerService, contentService, shippingService, paymentService, brandingService, policyService } from '../../services/adminServices';
 import { authService } from '../../services/authService';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import OrderDetailsModal from '../../components/OrderDetailsModal';
-import { LayoutDashboard, Package, ShoppingBag, Users, Plus, Edit, Trash2, Layers, Image as ImageIcon, FileText, X, MinusCircle, Truck, CreditCard, Palette } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingBag, Users, Plus, Edit, Trash2, Layers, Image as ImageIcon, FileText, X, MinusCircle, Truck, CreditCard, Palette, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AdminDashboard = () => {
@@ -379,6 +379,7 @@ const AdminDashboard = () => {
                     { id: 'content', icon: FileText, label: 'Content' },
                     { id: 'payment', icon: CreditCard, label: 'Payment' },
                     { id: 'branding', icon: Palette, label: 'Branding' },
+                    { id: 'policies', icon: Shield, label: 'Policies' },
                 ].map(item => (
                     <button
                         key={item.id}
@@ -809,6 +810,66 @@ const AdminDashboard = () => {
         }
     };
 
+    const [policyForm, setPolicyForm] = useState({ type: 'privacy', content: '' });
+
+    useEffect(() => {
+        if (activeTab === 'policies') {
+            loadPolicy(policyForm.type);
+        }
+    }, [activeTab]);
+
+    const loadPolicy = async (type) => {
+        setLoading(true);
+        const content = await policyService.getPolicy(type);
+        setPolicyForm({ type, content });
+        setLoading(false);
+    };
+
+    const handlePolicyChange = (type) => {
+        loadPolicy(type);
+    };
+
+    const handleSavePolicy = async () => {
+        try {
+            await policyService.savePolicy(policyForm.type, policyForm.content);
+            alert('Policy saved successfully');
+        } catch (error) {
+            alert('Failed to save policy');
+        }
+    };
+
+    const renderPolicies = () => (
+        <div className="p-8">
+            <h2 className="text-2xl font-bold text-[var(--color-secondary)] mb-6">Policy Management</h2>
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-[var(--color-border)]">
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-2">Select Policy</label>
+                    <select
+                        className="w-full p-2 border border-[var(--color-border)] rounded-md focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                        value={policyForm.type}
+                        onChange={(e) => handlePolicyChange(e.target.value)}
+                    >
+                        <option value="privacy">Privacy Policy</option>
+                        <option value="shipping">Shipping Policy</option>
+                        <option value="terms">Terms & Conditions</option>
+                        <option value="return">Return Policy</option>
+                        <option value="refund">Refund Policy</option>
+                    </select>
+                </div>
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-2">Policy Content (HTML)</label>
+                    <textarea
+                        className="w-full h-96 p-4 border border-[var(--color-border)] rounded-md font-mono text-sm focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                        value={policyForm.content}
+                        onChange={(e) => setPolicyForm({ ...policyForm, content: e.target.value })}
+                        placeholder="<h1>Policy Title</h1><p>Policy content goes here...</p>"
+                    />
+                </div>
+                <Button onClick={handleSavePolicy}>Save Policy</Button>
+            </div>
+        </div>
+    );
+
     const renderBranding = () => (
         <div className="p-8">
             <h2 className="text-2xl font-bold text-[var(--color-secondary)] mb-6">Branding Configuration</h2>
@@ -851,6 +912,7 @@ const AdminDashboard = () => {
                 {activeTab === 'content' && renderContent()}
                 {activeTab === 'payment' && renderPayment()}
                 {activeTab === 'branding' && renderBranding()}
+                {activeTab === 'policies' && renderPolicies()}
             </div>
 
             {/* Product Modal */}

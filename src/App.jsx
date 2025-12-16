@@ -15,6 +15,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import Profile from './pages/Profile';
 import About from './pages/About';
 import OrderSuccess from './pages/OrderSuccess';
+import PolicyPage from './pages/PolicyPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -62,6 +63,14 @@ function App() {
               <Route index element={<Home />} />
               <Route path="shop" element={<Shop />} />
               <Route path="about" element={<About />} />
+
+              {/* Policy Routes */}
+              <Route path="privacy-policy" element={<PolicyPage type="privacy" title="Privacy Policy" />} />
+              <Route path="shipping-policy" element={<PolicyPage type="shipping" title="Shipping Policy" />} />
+              <Route path="terms-conditions" element={<PolicyPage type="terms" title="Terms & Conditions" />} />
+              <Route path="return-policy" element={<PolicyPage type="return" title="Return Policy" />} />
+              <Route path="refund-policy" element={<PolicyPage type="refund" title="Refund Policy" />} />
+
               <Route path="product/:id" element={<ProductDetail />} />
               <Route path="cart" element={<Cart />} />
               <Route path="checkout" element={

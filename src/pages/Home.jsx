@@ -26,7 +26,7 @@ const Home = () => {
                     bannerService.getAll()
                 ]);
                 setFeaturedProducts(products.slice(0, 4));
-                setReviews(fetchedReviews.length > 0 ? fetchedReviews : [
+                setReviews(fetchedReviews.length > 0 ? fetchedReviews.slice(0, 3) : [
                     { id: 1, name: "Rahul Sharma", comment: "The Sev is absolutely authentic! Reminds me of my childhood in Indore.", rating: 5 },
                     { id: 2, name: "Priya Patel", comment: "Fast delivery and fresh products. The Ratlami Sev is spicy and perfect.", rating: 5 },
                     { id: 3, name: "Amit Verma", comment: "Best place to buy Indori Namkeen online. Highly recommended!", rating: 4 },
@@ -50,7 +50,7 @@ const Home = () => {
             setReviewForm({ name: '', comment: '', rating: 5 });
             // Refresh reviews
             const newReviews = await reviewService.getAllReviews();
-            setReviews(newReviews);
+            setReviews(newReviews.slice(0, 3));
         } catch (error) {
             console.error(error);
             alert('Failed to submit review');
@@ -60,7 +60,12 @@ const Home = () => {
     return (
         <div className="bg-gray-50 min-h-screen">
             {/* Hero Section */}
-            {banners.length > 0 ? (
+            {/* Hero Section */}
+            {loading ? (
+                <div className="h-[500px] md:h-[700px] bg-gray-200 animate-pulse flex items-center justify-center">
+                    <div className="text-gray-400">Loading Banners...</div>
+                </div>
+            ) : banners.length > 0 ? (
                 <BannerCarousel banners={banners} />
             ) : (
                 <section className="relative h-[700px] flex items-center justify-center overflow-hidden bg-[var(--color-secondary)] text-white">

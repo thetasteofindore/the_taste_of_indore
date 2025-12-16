@@ -172,3 +172,44 @@ export const brandingService = {
     }
 };
 
+// Start of Policy Service
+export const policyService = {
+    getPolicy: async (type) => {
+        try {
+            const docRef = doc(db, 'content', 'policies');
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                return data[type] || '';
+            }
+            return '';
+        } catch (error) {
+            console.error("Error getting policy: ", error);
+            return '';
+        }
+    },
+    savePolicy: async (type, content) => {
+        try {
+            const docRef = doc(db, 'content', 'policies');
+            // We use setDoc with merge: true to not overwrite other policies
+            await setDoc(docRef, { [type]: content }, { merge: true });
+        } catch (error) {
+            console.error("Error saving policy: ", error);
+            throw error;
+        }
+    },
+    getAllPolicies: async () => {
+        try {
+            const docRef = doc(db, 'content', 'policies');
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                return docSnap.data();
+            }
+            return {};
+        } catch (error) {
+            console.error("Error getting all policies: ", error);
+            return {};
+        }
+    }
+};
+
