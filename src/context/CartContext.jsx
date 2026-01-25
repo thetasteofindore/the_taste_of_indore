@@ -31,30 +31,13 @@ export const CartProvider = ({ children }) => {
         setCart(prevCart => {
             const existingItem = prevCart.find(item => item.id === product.id);
             if (existingItem) {
-                const newQuantity = existingItem.quantity + quantity;
-                const maxQty = product.maxOrderQuantity || 999;
-
-                if (newQuantity > maxQty) {
-                    alert(`Cannot add more. Maximum allowed quantity is ${maxQty}`);
-                    return prevCart;
-                }
-
                 return prevCart.map(item =>
                     item.id === product.id
-                        ? { ...item, quantity: newQuantity }
+                        ? { ...item, quantity: item.quantity + quantity }
                         : item
                 );
             } else {
-                const minQty = product.minOrderQuantity || 1;
-                const maxQty = product.maxOrderQuantity || 999;
-
-                let initialQty = Math.max(quantity, minQty);
-                if (initialQty > maxQty) {
-                    alert(`Cannot add. Maximum allowed quantity is ${maxQty}`);
-                    return prevCart;
-                }
-
-                return [...prevCart, { ...product, quantity: initialQty }];
+                return [...prevCart, { ...product, quantity }];
             }
         });
     };
@@ -64,17 +47,7 @@ export const CartProvider = ({ children }) => {
     };
 
     const updateQuantity = (productId, quantity) => {
-        const item = cart.find(i => i.id === productId);
-        if (!item) return;
-
-        const minQty = item.minOrderQuantity || 1;
-        const maxQty = item.maxOrderQuantity || 999;
-
-        if (quantity < minQty) return;
-        if (quantity > maxQty) {
-            alert(`Maximum quantity allows is ${maxQty}`);
-            return;
-        }
+        if (quantity < 1) return;
         setCart(prevCart =>
             prevCart.map(item =>
                 item.id === productId ? { ...item, quantity } : item
