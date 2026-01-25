@@ -4,13 +4,12 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { orderService } from '../services/orderService';
 import { authService } from '../services/authService';
-import { shippingService, paymentService, phonePeService } from '../services/adminServices';
+import { shippingService, paymentService } from '../services/adminServices';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin } from 'lucide-react';
 import { CONFIG } from '../utils/config';
-import ResultModal from '../components/ResultModal';
 
 const Checkout = () => {
     const { cart, total, clearCart } = useCart();
@@ -34,14 +33,6 @@ const Checkout = () => {
         state: '',
         pincode: '',
         phone: ''
-    });
-
-    const [resultModal, setResultModal] = useState({
-        isOpen: false,
-        type: 'success',
-        title: '',
-        message: '',
-        data: null
     });
 
     useEffect(() => {
@@ -127,96 +118,10 @@ const Checkout = () => {
 
     const handlePlaceOrder = async (e) => {
         e.preventDefault();
-
-        // Validation
-        const requiredFields = ['name', 'phone', 'address', 'city', 'state', 'pincode'];
-        const missingFields = requiredFields.filter(field => !formData[field] || formData[field].trim() === '');
-
-        if (missingFields.length > 0) {
-            alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
-            // Focus on the first missing field
-            const firstMissing = document.getElementById(missingFields[0]);
-            if (firstMissing) firstMissing.focus();
-            return;
-        }
-
         if (paymentMethod === 'upi') {
             setShowUpiModal(true);
-        } else if (paymentMethod === 'phonepe') {
-            handlePhonePePayment();
         } else {
             processOrder();
-        }
-    };
-
-    const handlePhonePePayment = async () => {
-        setLoading(true);
-        try {
-            // 1. Create Order first (Pending Payment)
-            const orderData = {
-                customer: user?.name || formData.name,
-                email: user?.email || formData.email,
-                total: finalTotal,
-                subtotal: total,
-                shippingCost: finalShippingCost,
-                items: cart.length,
-                cartItems: cart,
-                shippingAddress: formData,
-                paymentMethod: 'phonepe',
-                status: 'Pending Payment', // Distinct status
-                date: new Date().toLocaleDateString()
-            };
-
-            const orderRef = await orderService.createOrder(orderData);
-
-            // 2. Call Backend API to Initiate
-            const response = await fetch('/api/phonepe/initiate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    orderId: orderRef.id,
-                    amount: finalTotal,
-                    userId: user?.uid || 'guest_' + Date.now(),
-                    mobileNumber: formData.phone,
-                    redirectUrl: window.location.origin + '/payment-status',
-                    callbackUrl: window.location.origin + '/api/phonepe/callback'
-                })
-            });
-
-            const textResponse = await response.text();
-            let data;
-            try {
-                data = JSON.parse(textResponse);
-            } catch (err) {
-                console.error('Invalid JSON Response:', textResponse);
-                throw new Error('Server returned invalid response: ' + textResponse.substring(0, 100));
-            }
-
-            if (response.ok && data.url) {
-                // 3. Clear Cart and Redirect
-                clearCart();
-                window.location.href = data.url;
-            } else {
-                setResultModal({
-                    isOpen: true,
-                    type: 'error',
-                    title: 'PhonePe Initiation Failed',
-                    message: data.error || data.message || 'Unknown Error',
-                    data: data
-                });
-                setLoading(false);
-            }
-
-        } catch (error) {
-            console.error('PhonePe Error:', error);
-            setResultModal({
-                isOpen: true,
-                type: 'error',
-                title: 'Payment Initiation Error',
-                message: error.message || 'Check your connection and try again.',
-                data: null
-            });
-            setLoading(false);
         }
     };
 
@@ -384,22 +289,7 @@ const Checkout = () => {
                                     onChange={() => setPaymentMethod('upi')}
                                     className="mr-3 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                                 />
-                                <span className="font-medium">Direct UPI (Scan & Pay)</span>
-                            </label>
-
-                            <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${paymentMethod === 'phonepe' ? 'border-[var(--color-primary)] bg-orange-50' : 'border-gray-200'}`}>
-                                <input
-                                    type="radio"
-                                    name="payment"
-                                    value="phonepe"
-                                    checked={paymentMethod === 'phonepe'}
-                                    onChange={() => setPaymentMethod('phonepe')}
-                                    className="mr-3 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
-                                />
-                                <div className="flex flex-col">
-                                    <span className="font-medium">PhonePe Secure Payment</span>
-                                    <span className="text-xs text-gray-500">BHIM UPI, Credit/Debit Cards, NetBanking</span>
-                                </div>
+                                <span className="font-medium">UPI (Google Pay / PhonePe)</span>
                             </label>
                         </div>
                     </motion.div>
@@ -558,16 +448,7 @@ const Checkout = () => {
                     </div>
                 )}
             </AnimatePresence>
-
-            <ResultModal
-                isOpen={resultModal.isOpen}
-                onClose={() => setResultModal({ ...resultModal, isOpen: false })}
-                type={resultModal.type}
-                title={resultModal.title}
-                message={resultModal.message}
-                data={resultModal.data}
-            />
-        </div >
+        </div>
     );
 };
 

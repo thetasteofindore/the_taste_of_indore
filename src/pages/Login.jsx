@@ -8,7 +8,6 @@ import { motion } from 'framer-motion';
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [rememberMe, setRememberMe] = useState(true);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { login } = useAuth();
@@ -20,7 +19,7 @@ const Login = () => {
         setIsLoading(true);
 
         try {
-            await login(email, password, rememberMe);
+            await login(email, password);
             navigate('/'); // Redirect to home
         } catch (err) {
             setError('Invalid email or password');
@@ -70,12 +69,7 @@ const Login = () => {
 
                     <div className="flex items-center justify-between text-sm">
                         <label className="flex items-center">
-                            <input
-                                type="checkbox"
-                                className="mr-2 rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
-                                checked={rememberMe}
-                                onChange={(e) => setRememberMe(e.target.checked)}
-                            />
+                            <input type="checkbox" className="mr-2 rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]" />
                             <span className="text-[var(--color-text-muted)]">Remember me</span>
                         </label>
                         <a href="#" className="text-[var(--color-primary)] hover:underline">Forgot password?</a>

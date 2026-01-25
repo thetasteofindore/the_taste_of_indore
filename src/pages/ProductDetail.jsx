@@ -39,9 +39,6 @@ const ProductDetail = () => {
                     setSelectedVariant(productData.variants[0]);
                 }
 
-                // Set initial quantity
-                setQuantity(productData.minOrderQuantity || 1);
-
                 // Fetch reviews
                 const reviewData = await reviewService.getAllReviews(id);
                 setReviews(reviewData);
@@ -58,26 +55,12 @@ const ProductDetail = () => {
     }, [id, navigate]);
 
     const handleAddToCart = () => {
-        const minQty = product.minOrderQuantity || 1;
-        const maxQty = product.maxOrderQuantity || 999;
-
-        if (quantity < minQty) {
-            alert(`Minimum order quantity is ${minQty}`);
-            return;
-        }
-        if (quantity > maxQty) {
-            alert(`Maximum order quantity is ${maxQty}`);
-            return;
-        }
-
         const itemToAdd = {
             ...product,
             id: selectedVariant ? `${product.id}-${selectedVariant.weight}` : product.id,
             price: selectedVariant ? selectedVariant.price : product.price,
             weight: selectedVariant ? selectedVariant.weight : null,
-            image: activeImage || product.image,
-            minOrderQuantity: minQty,
-            maxOrderQuantity: maxQty
+            image: activeImage || product.image
         };
         addToCart(itemToAdd, quantity);
     };
@@ -222,17 +205,15 @@ const ProductDetail = () => {
                     <div className="flex items-center gap-4 mb-8">
                         <div className="flex items-center border border-[var(--color-border)] rounded-md">
                             <button
-                                className="px-4 py-2 hover:bg-gray-100 transition-colors disabled:opacity-50"
-                                onClick={() => setQuantity(Math.max((product.minOrderQuantity || 1), quantity - 1))}
-                                disabled={quantity <= (product.minOrderQuantity || 1)}
+                                className="px-4 py-2 hover:bg-gray-100 transition-colors"
+                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
                             >
                                 -
                             </button>
                             <span className="px-4 py-2 font-medium min-w-[3rem] text-center">{quantity}</span>
                             <button
-                                className="px-4 py-2 hover:bg-gray-100 transition-colors disabled:opacity-50"
-                                onClick={() => setQuantity(Math.min((product.maxOrderQuantity || 999), quantity + 1))}
-                                disabled={product.maxOrderQuantity && quantity >= product.maxOrderQuantity}
+                                className="px-4 py-2 hover:bg-gray-100 transition-colors"
+                                onClick={() => setQuantity(quantity + 1)}
                             >
                                 +
                             </button>
