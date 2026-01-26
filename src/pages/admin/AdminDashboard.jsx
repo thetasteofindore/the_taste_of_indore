@@ -41,8 +41,11 @@ const AdminDashboard = () => {
         image2: '',
         image3: '',
         image4: '',
+        image4: '',
         variants: [], // Array of { weight, price }
-        inStock: true
+        inStock: true,
+        minQuantity: 1,
+        maxQuantity: 100
     });
 
     // About Content Form State (Local)
@@ -123,6 +126,8 @@ const AdminDashboard = () => {
             const productData = {
                 ...productForm,
                 price: Number(productForm.price),
+                minQuantity: Number(productForm.minQuantity) || 1,
+                maxQuantity: Number(productForm.maxQuantity) || 100,
                 images: imagesArray,
                 image: imagesArray[0] || '', // Set main image to first image
                 rating: editingProduct ? editingProduct.rating : 0,
@@ -163,7 +168,9 @@ const AdminDashboard = () => {
             image3: '',
             image4: '',
             variants: [],
-            inStock: true
+            inStock: true,
+            minQuantity: 1,
+            maxQuantity: 100
         });
     };
 
@@ -180,7 +187,9 @@ const AdminDashboard = () => {
             image3: images[2] || '',
             image4: images[3] || '',
             variants: product.variants || [],
-            inStock: product.inStock
+            inStock: product.inStock,
+            minQuantity: product.minQuantity || 1,
+            maxQuantity: product.maxQuantity || 100
         });
         setShowProductModal(true);
     };
@@ -995,6 +1004,23 @@ const AdminDashboard = () => {
                                             onChange={(e) => setProductForm({ ...productForm, image4: e.target.value })}
                                         />
                                     </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input
+                                        label="Min Quantity"
+                                        type="number"
+                                        value={productForm.minQuantity}
+                                        onChange={(e) => setProductForm({ ...productForm, minQuantity: e.target.value })}
+                                        min="1"
+                                    />
+                                    <Input
+                                        label="Max Quantity"
+                                        type="number"
+                                        value={productForm.maxQuantity}
+                                        onChange={(e) => setProductForm({ ...productForm, maxQuantity: e.target.value })}
+                                        min="1"
+                                    />
                                 </div>
 
                                 <div>

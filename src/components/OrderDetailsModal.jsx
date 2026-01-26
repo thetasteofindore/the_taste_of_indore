@@ -23,7 +23,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
                     </button>
 
                     <div className="mb-6 border-b border-gray-100 pb-4">
-                        <div className="flex justify-between items-start">
+                        <div className="flex justify-between items-start pr-8">
                             <div>
                                 <h2 className="text-2xl font-bold text-[var(--color-secondary)]">Order #{order.id.slice(0, 8)}</h2>
                                 <p className="text-[var(--color-text-muted)]">Placed on {order.date}</p>

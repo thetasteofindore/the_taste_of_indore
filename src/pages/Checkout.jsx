@@ -116,8 +116,27 @@ const Checkout = () => {
         }
     };
 
+    const validateForm = () => {
+        const { name, phone, address, city, state, pincode } = formData;
+        if (!name || !phone || !address || !city || !state || !pincode) {
+            alert('Please fill in all shipping details.');
+            return false;
+        }
+        if (phone.length < 10) {
+            alert('Please enter a valid phone number.');
+            return false;
+        }
+        if (pincode.length < 6) {
+            alert('Please enter a valid pincode.');
+            return false;
+        }
+        return true;
+    };
+
     const handlePlaceOrder = async (e) => {
         e.preventDefault();
+        if (!validateForm()) return;
+
         if (paymentMethod === 'upi') {
             setShowUpiModal(true);
         } else {

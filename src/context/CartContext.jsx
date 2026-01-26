@@ -31,9 +31,11 @@ export const CartProvider = ({ children }) => {
         setCart(prevCart => {
             const existingItem = prevCart.find(item => item.id === product.id);
             if (existingItem) {
+                const max = existingItem.maxQuantity || 100;
+                const newQty = Math.min(existingItem.quantity + quantity, max);
                 return prevCart.map(item =>
                     item.id === product.id
-                        ? { ...item, quantity: item.quantity + quantity }
+                        ? { ...item, quantity: newQty }
                         : item
                 );
             } else {
@@ -47,11 +49,21 @@ export const CartProvider = ({ children }) => {
     };
 
     const updateQuantity = (productId, quantity) => {
-        if (quantity < 1) return;
         setCart(prevCart =>
-            prevCart.map(item =>
-                item.id === productId ? { ...item, quantity } : item
-            )
+            prevCart.map(item => {
+                if (item.id === productId) {
+                    const min = item.minQuantity || 1;
+                    const max = item.maxQuantity || 100;
+                    // Ensure we don't go below 0, but min limit is strictly enforced for >0 updates
+                    // However, to remove input, we usually handle that in UI. Here we expect valid number.
+                    // If quantity is 0, we might want to remove? 
+                    // Current logic was: if (quantity < 1) return; which implies min 1.
+                    // Let's stick to min limit.
+                    const newQty = Math.max(min, Math.min(quantity, max));
+                    return { ...item, quantity: newQty };
+                }
+                return item;
+            })
         );
     };
 

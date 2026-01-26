@@ -1,12 +1,13 @@
 import { auth, db } from '../firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
 import { doc, setDoc, getDoc, getDocs, collection, updateDoc, deleteDoc } from 'firebase/firestore';
 
 const CURRENT_USER_KEY = 'toi_current_user';
 
 export const authService = {
-  login: async (email, password) => {
+  login: async (email, password, rememberMe) => {
     try {
+      await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
@@ -26,7 +27,11 @@ export const authService = {
         await setDoc(doc(db, 'users', user.uid), userData);
       }
 
-      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userData));
+      if (rememberMe) {
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userData));
+      } else {
+        sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userData));
+      }
       return userData;
     } catch (error) {
       throw error;
@@ -60,11 +65,15 @@ export const authService = {
   logout: async () => {
     await signOut(auth);
     localStorage.removeItem(CURRENT_USER_KEY);
+    sessionStorage.removeItem(CURRENT_USER_KEY);
   },
 
   getCurrentUser: () => {
-    const userStr = localStorage.getItem(CURRENT_USER_KEY);
-    return userStr ? JSON.parse(userStr) : null;
+    const localUser = localStorage.getItem(CURRENT_USER_KEY);
+    if (localUser) return JSON.parse(localUser);
+
+    const sessionUser = sessionStorage.getItem(CURRENT_USER_KEY);
+    return sessionUser ? JSON.parse(sessionUser) : null;
   },
 
   getAllUsers: async () => {
